@@ -38,11 +38,21 @@ public class DatabaseManager {
                 "FOREIGN KEY (usuario_id) REFERENCES usuarios(id)" +
                 ");";
 
+        String sqlCurtidas = "CREATE TABLE IF NOT EXISTS curtidas (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "usuario_id INTEGER NOT NULL, " +
+                "postagem_id INTEGER NOT NULL, " +
+                "FOREIGN KEY (usuario_id) REFERENCES usuarios(id), " +
+                "FOREIGN KEY (postagem_id) REFERENCES postagens(id)" +
+                ");";
+
+
         try (Connection conn = conectar();
              Statement stmt = conn.createStatement()) {
             
             stmt.execute(sqlUsuarios);
             stmt.execute(sqlPostagens);
+            stmt.execute(sqlCurtidas);
             System.out.println("Tabelas verificadas/criadas com sucesso.");
             
         } catch (SQLException e) {
