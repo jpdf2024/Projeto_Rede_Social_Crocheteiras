@@ -1,6 +1,6 @@
 package com.projeto.croche;
 
-import com.projeto.croche.database.DatabaseManager;
+import com.projeto.croche.database_manager.DatabaseManager;
 
 public class Main {
     public static void main(String[] args) {

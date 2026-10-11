@@ -11,11 +11,11 @@ public class Postagem {
     private Usuario autor;
     private String imagemUrl;
     private String legenda;
-    private int quantidadeCurtidas;
+    //private int quantidadeCurtidas;
 
-    public void adicionarCurtida() {
-        this.quantidadeCurtidas++;
-    }
+    // public void adicionarCurtida() {
+    //     this.quantidadeCurtidas++;
+    // }
 
     public Long getId() {
         return id;
@@ -134,23 +134,22 @@ public class Postagem {
         // ou lançar exceção se for obrigatório
     }
 
-    public int getQuantidadeCurtidas() {
-        return quantidadeCurtidas;
-    }
+    // public int getQuantidadeCurtidas() {
+    //     return quantidadeCurtidas;
+    // }
 
-    public void setQuantidadeCurtidas(int quantidadeCurtidas) {
-        if (quantidadeCurtidas < 0) {
-            throw new IllegalArgumentException("Curtidas não podem ser negativas");
-        }
-        this.quantidadeCurtidas = quantidadeCurtidas;
-    }
+    // public void setQuantidadeCurtidas(int quantidadeCurtidas) {
+    //     if (quantidadeCurtidas < 0) {
+    //         throw new IllegalArgumentException("Curtidas não podem ser negativas");
+    //     }
+    //     this.quantidadeCurtidas = quantidadeCurtidas;
+    // }
 
-    public Postagem(Long id, Usuario autor, String imagemUrl, String legenda, int quantidadeCurtidas) {
+    public Postagem(Long id, Usuario autor, String imagemUrl, String legenda) {
         setId(id);
         setAutor(autor);
         setImagemUrl(imagemUrl);
         setLegenda(legenda);
-        setQuantidadeCurtidas(quantidadeCurtidas);
     }
 
 }
