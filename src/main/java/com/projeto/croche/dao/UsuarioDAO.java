@@ -12,26 +12,30 @@ public class UsuarioDAO {
         private static final UsuarioDAO INSTANCE = new UsuarioDAO();
     }
 
-    private UsuarioDAO() {}
+    private UsuarioDAO() {
+    }
 
     public static UsuarioDAO getInstance() {
         return Holder.INSTANCE;
     }
-    // Métodos para acessar e manipular os dados do usuário no banco de dados  
+
+    // Métodos para acessar e manipular os dados do usuário no banco de dados
     public void salvarUsuario(String nome, String email, String senhaHash, String bio) {
         // Lógica para salvar o usuário no banco de dados
         try (Connection connection = DatabaseManager.conectar();
-             PreparedStatement statement = connection.prepareStatement(
-                     "INSERT INTO usuarios (nome, email, senha, bio) VALUES (?, ?, ?, ?)")) {
+                PreparedStatement statement = connection.prepareStatement(
+                        "INSERT INTO usuarios (nome, email, senha, bio) VALUES (?, ?, ?, ?)")) {
             statement.setString(1, nome);
             statement.setString(2, email);
             statement.setString(3, senhaHash);
             statement.setString(4, bio);
             statement.executeUpdate();
+            // } catch (SQLException e) {
+            // e.printStackTrace();
+            // }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Erro ao salvar usuário", e);
         }
         System.out.println("Salvando usuário: " + nome + ", Email: " + email);
     }
 }
-
