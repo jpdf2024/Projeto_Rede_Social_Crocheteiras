@@ -9,4 +9,8 @@ POST /api/postagens (para receber e registrar uma nova publicação com foto e l
 
 public class PostagemController {
 
+// SELECT p.id, p.imagem_url, p.legenda, u.nome AS autor
+// FROM postagens p
+// JOIN usuarios u ON u.id = p.usuario_id;
+
 }
