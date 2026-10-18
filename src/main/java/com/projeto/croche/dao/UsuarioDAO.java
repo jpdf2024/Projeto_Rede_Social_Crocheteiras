@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 import com.projeto.croche.database_manager.DatabaseManager;
 
 //Instância única da classe UsuarioDAO, método getInstance() retorna a instância única da classe, garantindo que apenas uma instância seja criada durante a execução do programa. Isso é útil para gerenciar o acesso aos dados do usuário de forma centralizada e consistente.
@@ -20,8 +22,9 @@ public class UsuarioDAO {
     }
 
     // Métodos para acessar e manipular os dados do usuário no banco de dados
-    public void salvarUsuario(String nome, String email, String senhaHash, String bio) {
+    public void salvarUsuario(String nome, String email, String senha, String bio) {
         // Lógica para salvar o usuário no banco de dados
+        String senhaHash = BCrypt.hashpw(senha, BCrypt.gensalt(12));
         try (Connection connection = DatabaseManager.conectar();
                 PreparedStatement statement = connection.prepareStatement(
                         "INSERT INTO usuarios (nome, email, senha, bio) VALUES (?, ?, ?, ?)")) {
