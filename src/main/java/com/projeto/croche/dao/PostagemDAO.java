@@ -38,6 +38,6 @@ public class PostagemDAO {
         }
 
         // Lógica para salvar a postagem no banco de dados
-        System.out.println("Salvando postagem: " + legenda + ", Autor: " + autor);
+        System.out.println("Salvando postagem: " + legenda + ", Autor: " + usuarioId);
     }
 }
