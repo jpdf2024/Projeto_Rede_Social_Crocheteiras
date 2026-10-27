@@ -1,0 +1,126 @@
+@startuml name "Modelo de Classes - Projeto Crochê"
+skinparam style strictuml
+skinparam classAttributeIconSize 0
+
+package com.projeto.croche.model {
+    class Usuario {
+        - Long id
+        - String nome
+        - String email
+        - String senhaHash
+        - String bio
+        + Long getId()
+        + void setId(Long id)
+        + String getNome()
+        + void setNome(String nome)
+        + String getEmail()
+        + void setEmail(String email)
+        + String getSenhaHash()
+        + void setSenhaHash(String senhaHash)
+        + String getBio()
+        + void setBio(String bio)
+    }
+
+    class Postagem {
+        - Long id
+        - Usuario autor
+        - String imagemUrl
+        - String legenda
+        + Long getId()
+        + void setId(Long id)
+        + Usuario getAutor()
+        + void setAutor(Usuario autor)
+        + String getImagemUrl()
+        + void setImagemUrl(String imagemUrl)
+        + String getLegenda()
+        + void setLegenda(String legenda)
+    }
+
+    class Curtidas {
+        - int id
+        - int idPostagem
+        - int idUsuario
+        - int quantidadeCurtidas
+        + int getQuantidadeCurtidas()
+        + void setQuantidadeCurtidas(int qtd)
+        + void incrementarCurtidas()
+        + int getId()
+        + void setId(int id)
+        + int getIdPostagem()
+        + void setIdPostagem(int idPostagem)
+        + int getIdUsuario()
+        + void setIdUsuario(int idUsuario)
+    }
+}
+
+package com.projeto.croche.dao {
+    class UsuarioDAO {
+        - {static} UsuarioDAO INSTANCE
+        - UsuarioDAO()
+        + {static} UsuarioDAO getInstance()
+        + void salvarUsuario(Usuario usuario)
+        + void salvarUsuario(String nome, String email, String senha, String bio)
+    }
+
+    class PostagemDAO {
+        - {static} PostagemDAO INSTANCE
+        - PostagemDAO()
+        + {static} PostagemDAO getInstance()
+        + void salvarPostagem(Long usuarioId, String imagemURL, String legenda)
+    }
+
+    class CurtidaDAO {
+        - {static} CurtidaDAO INSTANCE
+        - CurtidaDAO()
+        + {static} CurtidaDAO getInstance()
+        + void salvarCurtida(Long usuarioId, Long postagemId)
+    }
+}
+
+package com.projeto.croche.service {
+    class ServicoDeUpload {
+        - {static} String DIRETORIO_UPLOAD
+        + String salvarArquivoNoDisco(byte[] bytes, String nomeOriginal)
+    }
+
+    class AuthService {
+        + void autenticarUsuario(String email, String senha)
+    }
+}
+
+package com.projeto.croche.database_manager {
+    class DatabaseManager {
+        - {static} String URL_CONEXAO
+        + {static} Connection conectar()
+        + {static} void criarTabelas()
+    }
+}
+
+package com.projeto.croche.validador_email {
+    interface ValidadorEmail {
+        + boolean validar(String email)
+    }
+
+    class RegexEmailAdapter {
+        + boolean validar(String email)
+    }
+
+    class EmailService {
+        - ValidadorEmail validador
+        + boolean validarEmail(String email)
+    }
+}
+
+' Relacionamentos e Associações principais
+Usuario "1" --> "*" Postagem : faz
+Postagem "*" o-- "1" Usuario : autor
+Usuario ..> EmailService : usa validação
+EmailService o--> ValidadorEmail : delega para
+RegexEmailAdapter ..|> ValidadorEmail : implementa
+UsuarioDAO ..> DatabaseManager : conecta via
+PostagemDAO ..> DatabaseManager : conecta via
+CurtidaDAO ..> DatabaseManager : conecta via
+AuthService ..> DatabaseManager : consulta
+Postagem ..> ServicoDeUpload : gerencia caminho
+
+@enduml
