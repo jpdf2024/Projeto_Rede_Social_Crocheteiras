@@ -1,7 +1,6 @@
 com\projeto\croche\dao\UsuarioDAO.class
-com\projeto\croche\database\DatabaseManager.class
 com\projeto\croche\model\Postagem.class
-com\projeto\croche\dao\PostagemDAO.class
 com\projeto\croche\service\ServicoDeUpload.class
 com\projeto\croche\model\Usuario.class
+com\projeto\croche\dao\PostagemDAO.class
 com\projeto\croche\Main.class

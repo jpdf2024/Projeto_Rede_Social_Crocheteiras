@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import org.mindrot.jbcrypt.BCrypt;
 
 import com.projeto.croche.database_manager.DatabaseManager;
+import com.projeto.croche.model.Usuario;
 
 //Instância única da classe UsuarioDAO, método getInstance() retorna a instância única da classe, garantindo que apenas uma instância seja criada durante a execução do programa. Isso é útil para gerenciar o acesso aos dados do usuário de forma centralizada e consistente.
 public class UsuarioDAO {
@@ -19,6 +20,10 @@ public class UsuarioDAO {
 
     public static UsuarioDAO getInstance() {
         return Holder.INSTANCE;
+    }
+
+    public void salvarUsuario(Usuario usuario) {
+        salvarUsuario(usuario.getNome(), usuario.getEmail(), usuario.getSenhaHash(), usuario.getBio());
     }
 
     // Métodos para acessar e manipular os dados do usuário no banco de dados
