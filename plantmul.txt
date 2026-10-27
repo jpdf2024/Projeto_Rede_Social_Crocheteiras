@@ -1,0 +1,741 @@
+package com.projeto.croche.model;
+
+import com.projeto.croche.validador_email.EmailService;
+
+public class Usuario {
+    private Long id;
+    private String nome;
+    private String email;
+    private String senhaHash;
+    private String bio;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        if (id != null && id < 0) {
+            throw new IllegalArgumentException("O id nao pode ser negativo");
+        }
+        this.id = id;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        if (nome == null || nome.isBlank()) {
+            throw new IllegalArgumentException("O nome e obrigatorio");
+        }
+        this.nome = nome;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+       //inserir um Pattern regex para validar o email 10.10.2026
+        // if (email == null || email.isBlank() || !email.contains("@")) {
+        //     throw new IllegalArgumentException("Informe um email valido");
+        // }
+        EmailService emailService = new EmailService();
+        if (!emailService.validarEmail(email)) {
+            throw new IllegalArgumentException("Informe um email valido");
+        }
+        this.email = email;
+    }
+
+    public String getSenhaHash() {
+        return senhaHash;
+    }
+
+    public void setSenhaHash(String senhaHash) {
+        if (senhaHash == null || senhaHash.isBlank()) {
+            throw new IllegalArgumentException("O hash da senha e obrigatorio");
+        }
+        this.senhaHash = senhaHash;
+    }
+
+    public String getBio() {
+        return bio;
+    }
+
+    public void setBio(String bio) {
+        this.bio = bio;
+    }
+
+    public Usuario(Long id, String nome, String email, String senhaHash, String bio) {
+        setId(id);
+        setNome(nome);
+        setEmail(email);
+        setSenhaHash(senhaHash);
+        setBio(bio);
+    }
+}
+
+package com.projeto.croche.model;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+public class Postagem {
+    private Long id;
+    private Usuario autor;
+    private String imagemUrl;
+    private String legenda;
+    //private int quantidadeCurtidas;
+
+    // public void adicionarCurtida() {
+    //     this.quantidadeCurtidas++;
+    // }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        if (id != null && id < 0) {
+            throw new IllegalArgumentException("O id nao pode ser negativo");
+        }
+        this.id = id;
+    }
+
+    public Usuario getAutor() {
+        return autor;
+    }
+
+    public void setAutor(Usuario autor) {
+        if (autor == null || autor.getNome().isBlank()) {
+            throw new IllegalArgumentException("O nome do autor e obrigatorio");
+        }
+
+        this.autor = autor;
+    }
+
+    public String getImagemUrl() {
+        return imagemUrl;
+    }
+
+    // public void setImagemUrl(String imagemUrl) {
+    // this.imagemUrl = imagemUrl;
+    // }
+
+    /*
+     * public void setImagemUrl(String imagemUrl) {
+     * if (imagemUrl == null || imagemUrl.isBlank()) {
+     * this.imagemUrl = null;
+     * return;
+     * }
+     * 
+     * try {
+     * URI uri = new URI(imagemUrl);
+     * 
+     * if (!"http".equalsIgnoreCase(uri.getScheme())
+     * && !"https".equalsIgnoreCase(uri.getScheme())) {
+     * throw new IllegalArgumentException("A URL deve usar http ou https");
+     * }
+     * 
+     * if (uri.getHost() == null) {
+     * throw new IllegalArgumentException("Informe uma URL válida");
+     * }
+     * 
+     * this.imagemUrl = imagemUrl;
+     * } catch (URISyntaxException e) {
+     * throw new IllegalArgumentException("Informe uma URL válida", e);
+     * }
+     * }
+     * 
+     * public String getLegenda() {
+     * return legenda;
+     * }
+     */
+
+    public void setImagemUrl(String imagemUrl) {
+        if (imagemUrl == null || imagemUrl.isBlank()) {
+            throw new IllegalArgumentException("A imagem é obrigatória.");
+        }
+
+        String valorLimpo = imagemUrl.trim();
+
+        // Tenta validar se é um link da web (http ou https)
+        if (isUrlValida(valorLimpo)) {
+            this.imagemUrl = valorLimpo;
+            return;
+        }
+
+        // Se não for URL, tenta validar se é um caminho de arquivo físico válido no
+        // computador
+        if (isArquivoLocalValido(valorLimpo)) {
+            this.imagemUrl = valorLimpo;
+            return;
+        }
+
+        throw new IllegalArgumentException("Informe uma URL válida ou um caminho de arquivo de imagem existente.");
+    }
+
+    // Auxiliar para validar URLs da web
+    private boolean isUrlValida(String texto) {
+        try {
+            URI uri = new URI(texto);
+            String esquema = uri.getScheme();
+            return ("http".equalsIgnoreCase(esquema) || "https".equalsIgnoreCase(esquema))
+                    && uri.getHost() != null;
+        } catch (URISyntaxException e) {
+            return false;
+        }
+    }
+
+    // Auxiliar para validar se o arquivo físico realmente existe na máquina
+    private boolean isArquivoLocalValido(String caminho) {
+        try {
+            Path path = Paths.get(caminho);
+            // Verifica se o arquivo existe no disco e não é um diretório
+            return Files.exists(path) && !Files.isDirectory(path);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public String getLegenda() {
+        return legenda;
+    }
+    public void setLegenda(String legenda) {
+        if (legenda != null && !legenda.isBlank()) {
+            this.legenda = legenda;
+        }
+        // ou lançar exceção se for obrigatório
+    }
+
+    // public int getQuantidadeCurtidas() {
+    //     return quantidadeCurtidas;
+    // }
+
+    // public void setQuantidadeCurtidas(int quantidadeCurtidas) {
+    //     if (quantidadeCurtidas < 0) {
+    //         throw new IllegalArgumentException("Curtidas não podem ser negativas");
+    //     }
+    //     this.quantidadeCurtidas = quantidadeCurtidas;
+    // }
+
+    public Postagem(Long id, Usuario autor, String imagemUrl, String legenda) {
+        setId(id);
+        setAutor(autor);
+        setImagemUrl(imagemUrl);
+        setLegenda(legenda);
+    }
+
+}
+
+package com.projeto.croche.model;
+
+public class Curtidas {
+    // preciso do id da postagem e do id do usuario que curtiu
+    private int id;
+    private int idPostagem;
+    private int idUsuario;
+    private int quantidadeCurtidas;
+
+    public int getQuantidadeCurtidas() {
+        return quantidadeCurtidas;
+    }
+
+    public void setQuantidadeCurtidas(int quantidadeCurtidas) {
+        if (quantidadeCurtidas < 0) {
+            throw new IllegalArgumentException("Curtidas não podem ser negativas");
+        }
+        this.quantidadeCurtidas = quantidadeCurtidas;
+    }
+
+    // método para incrementar a quantidade de curtidas na postagem
+    public void incrementarCurtidas() {
+        this.quantidadeCurtidas++;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        if (id < 0) {
+            throw new IllegalArgumentException("O id nao pode ser negativo");
+        }
+
+        this.id = id;
+    }
+
+    public int getIdPostagem() {
+        return idPostagem;
+    }
+
+    public void setIdPostagem(int idPostagem) {
+        if (idPostagem < 0) {
+            throw new IllegalArgumentException("O id da postagem nao pode ser negativo");
+        }
+
+        this.idPostagem = idPostagem;
+    }
+
+    public int getIdUsuario() {
+        return idUsuario;
+    }
+
+    public void setIdUsuario(int idUsuario) {
+        if (idUsuario < 0) {
+            throw new IllegalArgumentException("O id do usuario nao pode ser negativo");
+        }
+
+        this.idUsuario = idUsuario;
+    }
+
+    public Curtidas(int id, int idPostagem, int idUsuario) {
+        setId(id);
+        setIdPostagem(idPostagem);
+        setIdUsuario(idUsuario);
+        this.quantidadeCurtidas = 0;
+    }
+}
+
+package com.projeto.croche.service;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+
+public class ServicoDeUpload {
+
+    // Pasta onde os arquivos serão salvos no computador/servidor
+    private static final String DIRETORIO_UPLOAD = "database/upload/";
+
+    public String salvarArquivoNoDisco(byte[] bytesDoArquivo, String nomeOriginalDoArquivo) {
+        try {
+            // Garante que a pasta de uploads existe, senão ele cria
+            Path caminhoDiretorio = Paths.get(DIRETORIO_UPLOAD);
+            if (!Files.exists(caminhoDiretorio)) {
+                Files.createDirectories(caminhoDiretorio);
+            }
+
+            // Define o caminho final onde o arquivo será guardado
+            Path caminhoCompleto = caminhoDiretorio.resolve(System.currentTimeMillis() + "_" + nomeOriginalDoArquivo);
+
+            // Salva os bytes fisicamente no disco rigido
+            Files.write(caminhoCompleto, bytesDoArquivo);
+
+            // Retorna a string do caminho relativo para salvar no objeto Postagem
+            return caminhoCompleto.toString();
+            
+        } catch (Exception e) {
+            throw new RuntimeException("Falha ao salvar o arquivo físico no computador: " + e.getMessage());
+        }
+    }
+}
+
+package com.projeto.croche.service;
+
+public class PostagemService {
+    /*Gerencia a lógica de negócio para as postagens */
+}
+
+package com.projeto.croche.service;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import org.mindrot.jbcrypt.BCrypt;
+
+import com.projeto.croche.database_manager.DatabaseManager;
+
+public class AuthService {
+    /* Autenticação de usuárias */
+    public void autenticarUsuario(String email, String senha) {
+        System.out.println("Autenticando usuária...");
+
+        boolean usuarioEncontrado = false;
+
+        String sqlBusca = "SELECT u.id, u.senha " +
+                     "FROM usuarios u " +
+                     "WHERE u.email = ?";
+
+         try (Connection conn = DatabaseManager.conectar(); 
+         PreparedStatement pstmt = conn.prepareStatement(sqlBusca)) {
+        
+        pstmt.setString(1, email);
+
+        try (ResultSet rs = pstmt.executeQuery()) {
+            if (rs.next()) {
+                String senhaHash = rs.getString("senha");
+                // Verifica se a senha fornecida corresponde ao hash armazenado no banco de dados
+                if (BCrypt.checkpw(senha, senhaHash)) {
+                    int usuarioId = rs.getInt("id");
+                    usuarioEncontrado = true;
+
+                    System.out.println("Usuária autenticada com sucesso!");
+                    System.out.println("ID: " + usuarioId);
+                }
+            }
+            if (!usuarioEncontrado) {
+                System.out.println("E-mail ou senha inválidos.");
+            }
+        }
+    } catch (SQLException e) {
+        System.out.println("Erro ao buscar dados: " + e.getMessage());
+        return; // Sai do método se der erro na busca
+    }
+
+    }
+}
+
+package com.projeto.croche.validador_email;
+
+public interface ValidadorEmail {
+    boolean validar(String email);
+}
+
+package com.projeto.croche.validador_email;
+
+public class RegexEmailAdapter implements ValidadorEmail  {
+    @Override 
+    public boolean validar(String email) {
+        String regex = "^[A-Za-z0-9+_.-]+@(?:[A-Za-z0-9-]+\\.)+[A-Za-z]{2,}$";
+        if (email == null|| email.isBlank() || !email.contains("@")) return false;
+        return email.matches(regex);
+    }
+}
+
+package com.projeto.croche.validador_email;
+
+public class EmailService {
+
+    private ValidadorEmail validador;
+
+    public EmailService() {
+        this(new RegexEmailAdapter());
+    }
+
+    public EmailService(ValidadorEmail validador) {
+        this.validador = validador;
+    }
+
+    public boolean validarEmail(String email) {
+        return validador.validar(email);
+    }
+}
+
+package com.projeto.croche.database_manager;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+public class DatabaseManager {
+    // Caminho onde o arquivo do banco de dados será salvo
+    private static final String URL_CONEXAO = "jdbc:sqlite:database/croche.db";
+
+    public static Connection conectar() {
+        Connection conexao = null;
+
+        // cria a pasta 'database' caso não exista
+        try {
+            // Garante que a pasta 'database' existe antes de conectar
+            java.io.File pasta = new java.io.File("database");
+            if (!pasta.exists()) {
+                pasta.mkdirs();
+            }
+        } catch (Exception e) {
+            System.out.println("Erro ao criar pasta do banco de dados: " + e.getMessage());
+        }
+
+        try {
+            conexao = DriverManager.getConnection(URL_CONEXAO);
+            System.out.println("Conexão com o SQLite estabelecida com sucesso!");
+        } catch (SQLException e) {
+            System.out.println("Erro ao conectar com o banco de dados: " + e.getMessage());
+        }
+        return conexao;
+    }
+
+    // Método para criar as tabelas iniciais automaticamente ao iniciar o app
+    public static void criarTabelas() {
+        String sqlUsuarios = "CREATE TABLE IF NOT EXISTS usuarios (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "nome TEXT NOT NULL, " +
+                "email TEXT UNIQUE NOT NULL, " +
+                "senha TEXT NOT NULL, " +
+                "bio TEXT" +
+                ");";
+
+        String sqlPostagens = "CREATE TABLE IF NOT EXISTS postagens (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "usuario_id INTEGER NOT NULL, " +
+                "imagem_url TEXT NOT NULL, " +
+                "legenda TEXT, " +
+                "FOREIGN KEY (usuario_id) REFERENCES usuarios(id)" +
+                ");";
+
+        String sqlCurtidas = "CREATE TABLE IF NOT EXISTS curtidas (" +
+        // "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "usuario_id INTEGER NOT NULL, " +
+                "postagem_id INTEGER NOT NULL, " +
+                "PRIMARY KEY (usuario_id, postagem_id), " +
+                "FOREIGN KEY (usuario_id) REFERENCES usuarios(id), " +
+                "FOREIGN KEY (postagem_id) REFERENCES postagens(id)" +
+                ");";
+
+        try (Connection conn = conectar();
+                Statement stmt = conn.createStatement()) {
+
+            stmt.execute(sqlUsuarios);
+            stmt.execute(sqlPostagens);
+            stmt.execute(sqlCurtidas);
+            System.out.println("Tabelas verificadas/criadas com sucesso.");
+
+        } catch (SQLException e) {
+            System.out.println("Erro ao criar tabelas: " + e.getMessage());
+        }
+    }
+}
+
+package com.projeto.croche.dao;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+import org.mindrot.jbcrypt.BCrypt;
+
+import com.projeto.croche.database_manager.DatabaseManager;
+import com.projeto.croche.model.Usuario;
+
+//Instância única da classe UsuarioDAO, método getInstance() retorna a instância única da classe, garantindo que apenas uma instância seja criada durante a execução do programa. Isso é útil para gerenciar o acesso aos dados do usuário de forma centralizada e consistente.
+public class UsuarioDAO {
+    private static class Holder {
+        private static final UsuarioDAO INSTANCE = new UsuarioDAO();
+    }
+
+    private UsuarioDAO() {
+    }
+
+    public static UsuarioDAO getInstance() {
+        return Holder.INSTANCE;
+    }
+
+    public void salvarUsuario(Usuario usuario) {
+        salvarUsuario(usuario.getNome(), usuario.getEmail(), usuario.getSenhaHash(), usuario.getBio());
+    }
+
+    // Métodos para acessar e manipular os dados do usuário no banco de dados
+    public void salvarUsuario(String nome, String email, String senha, String bio) {
+        // Lógica para salvar o usuário no banco de dados
+        String senhaHash = BCrypt.hashpw(senha, BCrypt.gensalt(12));
+        try (Connection connection = DatabaseManager.conectar();
+                PreparedStatement statement = connection.prepareStatement(
+                        "INSERT INTO usuarios (nome, email, senha, bio) VALUES (?, ?, ?, ?)")) {
+            statement.setString(1, nome);
+            statement.setString(2, email);
+            statement.setString(3, senhaHash);
+            statement.setString(4, bio);
+            statement.executeUpdate();
+            // } catch (SQLException e) {
+            // e.printStackTrace();
+            // }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao salvar usuário", e);
+        }
+        System.out.println("Salvando usuário: " + nome + ", Email: " + email);
+    }
+}
+
+package com.projeto.croche.dao;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+import com.projeto.croche.database_manager.DatabaseManager;
+
+public class PostagemDAO {
+
+    // Instância única da classe PostagemDAO, método getInstance() retorna a
+    // instância única da classe, garantindo que apenas uma instância seja criada
+    // durante a execução do programa. Isso é útil para gerenciar o acesso aos dados
+    // das postagens de forma centralizada e consistente.
+    private static class Holder {
+        private static final PostagemDAO INSTANCE = new PostagemDAO();
+    }
+
+    private PostagemDAO() {
+    }
+
+    public static PostagemDAO getInstance() {
+        return Holder.INSTANCE;
+    }
+
+    // Métodos para acessar e manipular os dados das postagens no banco de dados
+    public void salvarPostagem(Long usuarioId, String imagemURL, String legenda) {
+
+        try (Connection connection = DatabaseManager.conectar();
+                PreparedStatement statement = connection.prepareStatement(
+                        "INSERT INTO postagens (usuario_id, imagem_url, legenda) VALUES (?, ?, ?)")) {
+            statement.setLong(1, usuarioId);
+            statement.setString(2, imagemURL);
+            statement.setString(3, legenda);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao salvar postagem", e);
+        }
+
+        // Lógica para salvar a postagem no banco de dados
+        System.out.println("Salvando postagem: " + legenda + ", Autor: " + usuarioId);
+    }
+}
+
+package com.projeto.croche.dao;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+import com.projeto.croche.database_manager.DatabaseManager;
+
+public class CurtidaDAO {
+
+    // Instância única da classe CurtidaDAO, método getInstance() retorna a
+    // instância única da classe, garantindo que apenas uma instância seja criada
+    // durante a execução do programa. Isso é útil para gerenciar o acesso aos dados
+    // das curtidas de forma centralizada e consistente.
+    private static class Holder {
+        private static final CurtidaDAO INSTANCE = new CurtidaDAO();
+    }
+
+    private CurtidaDAO() {
+    }
+
+    public static CurtidaDAO getInstance() {
+        return Holder.INSTANCE;
+    }
+
+        // Métodos para acessar e manipular os dados das postagens no banco de dados
+    public void salvarCurtida(Long usuarioId, Long postagemId) {
+
+        try (Connection connection = DatabaseManager.conectar();
+                PreparedStatement statement = connection.prepareStatement(
+                        "INSERT INTO curtidas (usuario_id, postagem_id) VALUES (?, ?)")) {
+            statement.setLong(1, usuarioId);
+            statement.setLong(2, postagemId);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao salvar curtida", e);
+        }
+
+        // Lógica para salvar a curtida no banco de dados
+        System.out.println("Salvando curtida: Usuario ID: " + usuarioId + ", Postagem ID: " + postagemId);
+    }
+
+
+}
+
+
+
+
+package com.projeto.croche.controller;
+/*Gerencia os pontos de entrada voltados para o conteúdo visual da rede social.
+
+Exemplos de rotas (endpoints) que ele conteria:
+
+GET /api/postagens (para carregar o feed com todas as fotos das peças de crochê).
+
+POST /api/postagens (para receber e registrar uma nova publicação com foto e legenda). */
+
+public class PostagemController {
+
+// SELECT p.id, p.imagem_url, p.legenda, u.nome AS autor
+// FROM postagens p
+// JOIN usuarios u ON u.id = p.usuario_id;
+
+}
+
+package com.projeto.croche.controller;
+/*Gerencia os pontos de entrada voltados para a segurança e identificação das usuárias.
+
+Exemplos de rotas (endpoints) que ele conteria:
+
+POST /api/auth/registrar (para cadastrar uma nova crocheteira).
+
+POST /api/auth/login (para autenticar o acesso ao sistema). */
+
+public class AuthController {
+
+}
+
+package com.projeto.croche;
+
+import java.util.Scanner;
+
+import com.projeto.croche.dao.UsuarioDAO;
+import com.projeto.croche.database_manager.DatabaseManager;
+import com.projeto.croche.model.Usuario;
+
+public class Main {
+    public static void main(String[] args) {
+
+        System.out.println("Iniciando o sistema Clube do Crochê...");
+
+        // Garante que o banco e as tabelas existam
+        DatabaseManager.criarTabelas();
+
+        Scanner scanner = new Scanner(System.in, java.nio.charset.StandardCharsets.UTF_8);
+        int opcao = 0;
+
+        do {
+            System.out.println("\n=== CLUBE DO CROCHÊ (TESTE DE BACK-END) ===");
+            System.out.println("1. Cadastrar Usuária");
+            System.out.println("2. Fazer Nova Postagem");/*fazer login antes da postagem */
+            System.out.println("3. Listar Postagens");
+            System.out.println("0. Sair");
+            System.out.print("Escolha uma opção: ");
+
+            opcao = scanner.nextInt();
+            scanner.nextLine(); // Limpa o buffer do teclado
+
+            switch (opcao) {
+                case 1 -> cadastrarUsuario(scanner);
+                case 2 -> System.out.println("-> Aqui você testaria o salvamento de postagem e upload.");
+                case 3 -> System.out.println("-> Aqui você listaria os dados vindos do SQLite.");
+                case 0 -> System.out.println("Encerrando o sistema...");
+                default -> System.out.println("Opção inválida!");
+            }
+        } while (opcao != 0);
+
+        scanner.close();
+    }
+
+    private static void cadastrarUsuario(Scanner scanner) {
+
+        System.out.print("Digite o nome da usuária: ");
+        String nome = scanner.nextLine();
+
+        System.out.print("Digite o email da usuária: ");
+        String email = scanner.nextLine();
+
+        System.out.print("Digite a senha da usuária: ");
+        String senha = scanner.nextLine();
+
+        System.out.print("Digite a bio da usuária: ");
+        String bio = scanner.nextLine();
+
+        Usuario usuario = new Usuario(null, nome, email, senha, bio);
+        UsuarioDAO usuarioDAO = UsuarioDAO.getInstance();
+        usuarioDAO.salvarUsuario(usuario);
+
+        // Aqui você chamaria o seu UsuarioDAO / Servico para cadastrar uma usuária
+        System.out.println("-> Aqui você chamaria o seu UsuarioDAO / Servico.");
+    }
+}
