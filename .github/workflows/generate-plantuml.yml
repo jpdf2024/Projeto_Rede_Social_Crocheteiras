@@ -5,6 +5,7 @@ on:
     paths:
       - '**.puml'
       - '**.plantuml'
+    workflow_dispatch: # <--- Adicione esta linha para liberar o botão manual
 
 jobs:
   build:
