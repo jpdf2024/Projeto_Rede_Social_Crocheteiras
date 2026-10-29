@@ -24,4 +24,5 @@ jobs:
         with:
           commit_message: "docs: atualiza imagens dos diagramas PlantUML automaticamente [skip ci]"
           file_pattern: "docs/diagramas/*.png"
+
           
