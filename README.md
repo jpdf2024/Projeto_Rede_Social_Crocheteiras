@@ -9,15 +9,15 @@ Abaixo está o diagrama UML atualizado das classes do sistema:
 
 _Fase 1 (O Monólito Inicial): Comece criando um monólito simples onde as usuárias conseguem se cadastrar, fazer login, criar um perfil ("Crocheteira Master") e postar uma foto de crochê com legenda._
 
-    _Passo 1_: Defina o Escopo Mínimo (O "MVP")
+    Passo 1: Defina o Escopo Mínimo (O "MVP")
     Autenticação: Cadastro e Login de usuárias (com perfil diferenciado, ex: "Artesã" e "Visitante").
     Publicação: Uma tela simples onde a crocheteira consegue subir uma foto e escrever uma legenda sobre a peça que produziu.
     Feed Básico: Uma página principal que lista todas as fotos postadas em ordem cronológica.
 
-    _Passo 2_: Escolha a Tecnologia Base (O Monólito)
+    Passo 2: Escolha a Tecnologia Base (O Monólito)
     Crie um único projeto (monólito) usando a stack com a qual você quer se habituar ou consolidar conhecimentos.
 
-    _Passo 3_: Coloque a Mão na Massa (Primeiro Código)
+    Passo 3: Coloque a Mão na Massa (Primeiro Código)
     Crie o repositório do projeto no seu GitHub.
 
     Objetivo: Faça funcionar o ciclo básico: cadastrar uma usuária, fazer login e conseguir salvar um post no banco de dados.
