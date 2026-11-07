@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import com.projeto.croche.database_manager.DatabaseManager;
+import com.projeto.croche.model.Postagem;
 
 public class PostagemDAO {
 
@@ -39,5 +40,15 @@ public class PostagemDAO {
 
         // Lógica para salvar a postagem no banco de dados
         System.out.println("Salvando postagem: " + legenda + ", Autor: " + usuarioId);
+    }
+
+    public void salvarPostagem(Postagem postagem) {
+        if (postagem.getAutor().getId() == null) {
+            throw new IllegalArgumentException("O autor da postagem precisa estar autenticado");
+        }
+        salvarPostagem(
+                postagem.getAutor().getId(),
+                postagem.getImagemUrl(),
+                postagem.getLegenda());
     }
 }

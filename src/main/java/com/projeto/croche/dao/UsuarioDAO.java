@@ -23,7 +23,12 @@ public class UsuarioDAO {
     }
 
     public void salvarUsuario(Usuario usuario) {
-        salvarUsuario(usuario.getNome(), usuario.getEmail(), usuario.getSenhaHash(), usuario.getBio());
+        salvarUsuario(
+            usuario.getNome(),
+            usuario.getEmail(),
+            usuario.getSenhaHash(),
+            usuario.getBio()
+        );
     }
 
     // Métodos para acessar e manipular os dados do usuário no banco de dados

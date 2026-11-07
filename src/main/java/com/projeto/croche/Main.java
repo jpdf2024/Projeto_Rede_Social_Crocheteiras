@@ -1,10 +1,14 @@
 package com.projeto.croche;
 
 import java.util.Scanner;
+import java.util.Optional;
 
 import com.projeto.croche.dao.UsuarioDAO;
 import com.projeto.croche.database_manager.DatabaseManager;
+import com.projeto.croche.model.Postagem;
 import com.projeto.croche.model.Usuario;
+import com.projeto.croche.service.AuthService;
+import com.projeto.croche.service.PostagemService;
 
 public class Main {
     public static void main(String[] args) {
@@ -30,7 +34,7 @@ public class Main {
 
             switch (opcao) {
                 case 1 -> cadastrarUsuario(scanner);
-                case 2 -> System.out.println("-> Aqui você testaria o salvamento de postagem e upload.");
+                case 2 -> fazerNovaPostagem(scanner);
                 case 3 -> System.out.println("-> Aqui você listaria os dados vindos do SQLite.");
                 case 0 -> System.out.println("Encerrando o sistema...");
                 default -> System.out.println("Opção inválida!");
@@ -58,7 +62,31 @@ public class Main {
         UsuarioDAO usuarioDAO = UsuarioDAO.getInstance();
         usuarioDAO.salvarUsuario(usuario);
 
-        // Aqui você chamaria o seu UsuarioDAO / Servico para cadastrar uma usuária
-        System.out.println("-> Aqui você chamaria o seu UsuarioDAO / Servico.");
+    }
+
+    public static void fazerNovaPostagem(Scanner scanner) {
+        //Autenticar usuária antes de permitir a postagem
+        System.out.print("Digite o email da usuária: ");    
+        String email = scanner.nextLine();
+        System.out.print("Digite a senha da usuária: ");
+        String senha = scanner.nextLine();
+        AuthService authService = new AuthService();
+        Optional<Usuario> usuarioAutenticado = authService.autenticarUsuario(email, senha);
+
+        if (usuarioAutenticado.isEmpty()) {
+            System.out.println("Não foi possível criar a postagem sem autenticação.");
+            return;
+        }
+
+        Usuario autor = usuarioAutenticado.get();
+        System.out.println("Usuária autenticada: " + autor.getNome());
+        System.out.print("Digite o caminho ou URL da imagem: ");
+        String imagemUrl = scanner.nextLine();
+        System.out.print("Digite a legenda: ");
+        String legenda = scanner.nextLine();
+
+        Postagem postagem = new Postagem(null, autor, imagemUrl, legenda);
+        new PostagemService().criarPostagem(postagem);
+        System.out.println("Postagem criada por: " + postagem.getAutor().getNome());
     }
 }

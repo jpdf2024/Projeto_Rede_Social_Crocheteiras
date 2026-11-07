@@ -4,19 +4,19 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Optional;
 
 import org.mindrot.jbcrypt.BCrypt;
 
 import com.projeto.croche.database_manager.DatabaseManager;
+import com.projeto.croche.model.Usuario;
 
 public class AuthService {
     /* Autenticação de usuárias */
-    public void autenticarUsuario(String email, String senha) {
+    public Optional<Usuario> autenticarUsuario(String email, String senha) {
         System.out.println("Autenticando usuária...");
 
-        boolean usuarioEncontrado = false;
-
-        String sqlBusca = "SELECT u.id, u.senha " +
+        String sqlBusca = "SELECT u.id, u.nome, u.email, u.senha, u.bio " +
                      "FROM usuarios u " +
                      "WHERE u.email = ?";
 
@@ -30,21 +30,24 @@ public class AuthService {
                 String senhaHash = rs.getString("senha");
                 // Verifica se a senha fornecida corresponde ao hash armazenado no banco de dados
                 if (BCrypt.checkpw(senha, senhaHash)) {
-                    int usuarioId = rs.getInt("id");
-                    usuarioEncontrado = true;
+                    Usuario usuario = new Usuario(
+                            rs.getLong("id"),
+                            rs.getString("nome"),
+                            rs.getString("email"),
+                            senhaHash,
+                            rs.getString("bio"));
 
                     System.out.println("Usuária autenticada com sucesso!");
-                    System.out.println("ID: " + usuarioId);
+                    System.out.println("ID: " + usuario.getId());
+                    return Optional.of(usuario);
                 }
             }
-            if (!usuarioEncontrado) {
-                System.out.println("E-mail ou senha inválidos.");
-            }
+            System.out.println("E-mail ou senha inválidos.");
+            return Optional.empty();
         }
     } catch (SQLException e) {
-        System.out.println("Erro ao buscar dados: " + e.getMessage());
-        return; // Sai do método se der erro na busca
+        throw new RuntimeException("Erro ao autenticar usuária", e);
+    }
     }
 
-    }
 }

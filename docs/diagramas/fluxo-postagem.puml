@@ -1,0 +1,101 @@
+@startuml
+title Diagrama de Atividades - Fazer Nova Postagem (Clube do Crochê)
+
+start
+
+:Usuária seleciona "2. Fazer Nova Postagem";
+
+:Solicitar e-mail;
+:Solicitar senha;
+
+:AuthService.autenticarUsuario(email, senha);
+
+:Conectar ao banco (DatabaseManager.conectar());
+
+:Executar SELECT em usuarios\nWHERE email = ?;
+
+if (Usuária encontrada?) then (não)
+  :Retornar Optional.empty();
+  :Exibir "E-mail ou senha inválidos.";
+  :Exibir "Não foi possível criar a postagem\nsem autenticação.";
+  stop
+else (sim)
+  :Obter senhaHash do banco;
+  :BCrypt.checkpw(senha, senhaHash);
+  if (Senha correta?) then (não)
+    :Retornar Optional.empty();
+    :Exibir "E-mail ou senha inválidos.";
+    :Exibir "Não foi possível criar a postagem\nsem autenticação.";
+    stop
+  else (sim)
+    :Montar objeto Usuario\n(id, nome, email, senhaHash, bio);
+    :Retornar Optional.of(usuario);
+    :Exibir "Usuária autenticada: <nome>";
+  endif
+endif
+
+:Solicitar caminho/URL da imagem;
+:Solicitar legenda;
+
+:new Postagem(null, autor, imagemUrl, legenda);
+
+' Construtor da Postagem (validações)
+:setId(null) -> OK;
+:setAutor(autor);
+if (autor == null ou nome em branco?) then (sim)
+  :Lançar IllegalArgumentException\n"nome do autor é obrigatório";
+  stop
+endif
+
+:setImagemUrl(imagemUrl);
+if (imagemUrl nula/vazia?) then (sim)
+  :Lançar IllegalArgumentException\n"A imagem é obrigatória.";
+  stop
+endif
+
+if (É URL http/https válida?) then (sim)
+  :imagemUrl = valorLimpo;
+else (não)
+  if (Arquivo local existe e não é diretório?) then (sim)
+    :imagemUrl = valorLimpo;
+  else (não)
+    :Lançar IllegalArgumentException\n"URL ou caminho inválido";
+    stop
+  endif
+endif
+
+:setLegenda(legenda);
+if (legenda não vazia?) then (sim)
+  :this.legenda = legenda;
+else (não)
+  :legenda permanece nula;
+endif
+
+:PostagemService.criarPostagem(postagem);
+
+:PostagemDAO.getInstance().salvarPostagem(postagem);
+
+if (autor.getId() == null?) then (sim)
+  :Lançar IllegalArgumentException\n"Autor precisa estar autenticado";
+  stop
+endif
+
+:PostagemDAO.salvarPostagem(usuarioId, imagemUrl, legenda);
+
+:DatabaseManager.conectar();
+
+:Preparar INSERT INTO postagens\n(usuario_id, imagem_url, legenda);
+
+:Executar statement.executeUpdate();
+
+if (Erro SQL?) then (sim)
+  :Lançar RuntimeException\n"Erro ao salvar postagem";
+  stop
+else (não)
+  :Registrar postagem no banco;
+endif
+
+:Exibir "Postagem criada por: <nome do autor>";
+
+stop
+@enduml
