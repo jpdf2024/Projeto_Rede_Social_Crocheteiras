@@ -7,6 +7,10 @@ Abaixo está o diagrama UML atualizado das classes do sistema:
 
 ![Diagrama de Classes](./docs/diagramas/modelo-croche.png)
 
+Abaixo está o diagrama de atividades da Postagem:
+
+![Diagrama de Atividades - Postagem](./docs/diagramas/fluxo-postagem.png)
+
 _Fase 1 (O Monólito Inicial): Comece criando um monólito simples onde as usuárias conseguem se cadastrar, fazer login, criar um perfil ("Crocheteira Master") e postar uma foto de crochê com legenda._
 
     Passo 1: Defina o Escopo Mínimo (O "MVP")
